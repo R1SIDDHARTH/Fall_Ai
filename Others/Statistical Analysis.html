@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fall Detection System: Statistical Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #1a5276;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        h2 {
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 50px;
+        }
+        .section {
+            margin-bottom: 60px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        canvas {
+            width: 100% !important;
+            max-width: 800px !important;
+            margin: 30px auto;
+            display: block;
+        }
+        #ageDistributionChart {
+            height: 400px !important; /* Reduced to medium size */
+        }
+        #marketGrowthChart, #fallDetectionMarketChart, #fallRateChart, #injuryTypeChart, #techAdoptionChart, #techComfortChart, #adoptionWillingnessChart, #marketShareChart, #techTypeChart, #brandOriginChart {
+            height: 500px !important; /* Consistent larger size for other charts */
+        }
+        .stats-list {
+            list-style-type: none;
+            padding: 0;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .stats-list li {
+            margin-bottom: 12px;
+            font-size: 18px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .stats-list li strong {
+            color: #2874a6;
+            min-width: 240px;
+            display: inline-block;
+        }
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        .stat-value {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #2874a6;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 12pt;
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #2874a6;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .two-column {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .column {
+            width: 48%;
+            min-width: 300px;
+        }
+        .conclusion-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 30px 0;
+            font-size: 16px;
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .chart-container {
+            position: relative;
+            margin: 20px auto;
+            max-width: 900px;
+        }
+        .market-penetration {
+            text-align: center;
+            font-size: 18px;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .column {
+                width: 100%;
+            }
+            canvas {
+                max-width: 100% !important;
+                height: 300px !important;
+            }
+            .stats-list li {
+                font-size: 16px;
+            }
+            .stat-box {
+                width: 45%;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Fall Detection Security Monitoring System: Statistical Analysis</h1>
+
+    <!-- Elderly Demographics Section -->
+    <div class="section">
+        <h2>1. Elderly Demographics in India</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value">149M</div>
+                <div class="stat-label">Total Elderly Population (2022)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">194M</div>
+                <div class="stat-label">Projected by 2031</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">319M</div>
+                <div class="stat-label">Projected by 2050</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">70%</div>
+                <div class="stat-label">Rural Elderly</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Age Distribution of Elderly Population in India (2021)</div>
+            <canvas id="ageDistributionChart"></canvas>
+        </div>
+        
+        <ul class="stats-list">
+            <li><strong>Elderly Population (2022):</strong> 149 million people aged 60+ in India</li>
+            <li><strong>Projected Population (2031):</strong> 194 million, expected to reach 319 million by 2050</li>
+            <li><strong>Rural Elderly:</strong> Approximately 70% reside in rural areas with limited healthcare access</li>
+            <li><strong>Fall Incidence Rate:</strong> 31% of elderly experience at least one fall annually; over 60% go undetected</li>
+            <li><strong>Fall Risk:</strong> Leading cause of injury-related death among the elderly</li>
+        </ul>
+        
+        <table>
+            <tr>
+                <th>State</th>
+                <th>Elderly Population (%)</th>
+                <th>Urban-Rural Ratio</th>
+            </tr>
+            <tr>
+                <td>Kerala</td>
+                <td>16.5%</td>
+                <td>1:1.8</td>
+            </tr>
+            <tr>
+                <td>Tamil Nadu</td>
+                <td>13.6%</td>
+                <td>1:2.1</td>
+            </tr>
+            <tr>
+                <td>Punjab</td>
+                <td>12.6%</td>
+                <td>1:2.4</td>
+            </tr>
+            <tr>
+                <td>Bihar</td>
+                <td>7.7%</td>
+                <td>1:8.3</td>
+            </tr>
+            <tr>
+                <td>Uttar Pradesh</td>
+                <td>8.1%</td>
+                <td>1:5.7</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Market Analysis Section -->
+    <div class="section">
+        <h2>2. Market Analysis for Elderly Care Technology</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value">₹32K Cr</div>
+                <div class="stat-label">Elderly Care Market (2023)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">27%</div>
+                <div class="stat-label">Annual Growth Rate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">₹25K Cr</div>
+                <div class="stat-label">Projected by 2026</div>
+            </div>
+        </div>
+        
+        <ul class="stats-list">
+            <li><strong>Elderly Care Market Size (2023):</strong> ₹32,000 crores (US$4.3 billion)</li>
+            <li><strong>Projected Spending (2026):</strong> Expected to cross ₹25,000 crores (US$3 billion)</li>
+            <li><strong>Annual Growth Rate:</strong> 27% CAGR (2023-2028)</li>
+            <li><strong>Market Drivers:</strong> Growing elderly population, rising awareness, disposable income, nuclear family structures</li>
+            <li><strong>Adoption Rate:</strong> 48% of urban households willing to invest in elderly safety tech</li>
+        </ul>
+        
+        <div class="chart-container">
+            <div class="chart-title">Projected Elderly Care Market Growth (2023-2028)</div>
+            <canvas id="marketGrowthChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Fall Detection System Market Section -->
+    <div class="section">
+        <h2>3. Fall Detection System Market</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value">$500M</div>
+                <div class="stat-label">Global Market (2023)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">$1.3B</div>
+                <div class="stat-label">Global by 2030</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">$360M</div>
+                <div class="stat-label">India Wearables (2023)</div>
+            </div>
+        </div>
+        
+        <ul class="stats-list">
+            <li><strong>Global Fall Detection Market (2023):</strong> USD 500 million, projected to reach USD 1.3 billion by 2030</li>
+            <li><strong>India’s Healthcare Wearable Market (2023):</strong> USD 360 million, growing at 20-25% CAGR</li>
+            <li><strong>Target Customers:</strong> Elderly living alone, chronic patients (e.g., Parkinson’s, epilepsy), hospitals, old-age homes, telemedicine</li>
+            <li><strong>Top Causes of Falls:</strong> Weak muscles/balance issues, medication side-effects, poor lighting, uneven surfaces, dizziness</li>
+        </ul>
+        
+        <div class="market-penetration">Market Penetration: 2.3% of elderly households</div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Fall Detection Market Size (2023 vs. 2028)</div>
+            <canvas id="fallDetectionMarketChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Fall Risk Statistics Section -->
+    <div class="section">
+        <h2>4. Fall Risk Statistics</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value">31%</div>
+                <div class="stat-label">Annual Fall Rate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">420K</div>
+                <div class="stat-label">Hospitalizations</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">35K</div>
+                <div class="stat-label">Annual Deaths</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">60%</div>
+                <div class="stat-label">Undetected Falls</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Fall Incidence Rate by Age Group</div>
+            <canvas id="fallRateChart"></canvas>
+        </div>
+        
+        <div class="two-column">
+            <div class="column">
+                <div class="chart-container">
+                    <div class="chart-title">Fall-Related Injury Distribution</div>
+                    <canvas id="injuryTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="column">
+                <ul class="stats-list">
+                    <li><strong>Increased Risk with Age:</strong> Fall risk increases to 45% for those 81+ years</li>
+                    <li><strong>Hospitalization Rate:</strong> Approximately 420,000 fall-related hospitalizations annually</li>
+                    <li><strong>Mortality Rate:</strong> Around 35,000 fall-related deaths annually in India</li>
+                    <li><strong>Undetected Falls:</strong> Over 60% of elderly falls go undetected</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="conclusion-box">
+            <p><strong>Healthcare Impact:</strong> Fall-related injuries cost the Indian healthcare system approximately ₹15,000 crores (US$2 billion) annually, significantly impacting quality of life and independence.</p>
+        </div>
+    </div>
+
+    <!-- Technology Adoption Section -->
+    <div class="section">
+        <h2>5. Technology Adoption Among Elderly</h2>
+        
+        <div class="chart-container">
+            <div class="chart-title">Technology Usage Among Indian Elderly</div>
+            <canvas id="techAdoptionChart"></canvas>
+        </div>
+        
+        <div class="two-column">
+            <div class="column">
+                <div class="chart-container">
+                    <div class="chart-title">Technology Comfort Level</div>
+                    <canvas id="techComfortChart"></canvas>
+                </div>
+            </div>
+            <div class="column">
+                <div class="chart-container">
+                    <div class="chart-title">Willingness to Adopt Fall Detection</div>
+                    <canvas id="adoptionWillingnessChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <table>
+            <tr>
+                <th>Age Group</th>
+                <th>Smartphone Usage</th>
+                <th>Internet Usage</th>
+                <th>Smart Home Adoption</th>
+            </tr>
+            <tr>
+                <td>60-70 years</td>
+                <td>45%</td>
+                <td>38%</td>
+                <td>12%</td>
+            </tr>
+            <tr>
+                <td>71-80 years</td>
+                <td>28%</td>
+                <td>21%</td>
+                <td>7%</td>
+            </tr>
+            <tr>
+                <td>81+ years</td>
+                <td>18%</td>
+                <td>12%</td>
+                <td>3%</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Competitive Landscape Section -->
+    <div class="section">
+        <h2>6. Competitive Landscape Analysis</h2>
+        
+        <div class="chart-container">
+            <div class="chart-title">Market Share in Indian Fall Detection Market</div>
+            <canvas id="marketShareChart"></canvas>
+        </div>
+        
+        <table>
+            <tr>
+                <th>Company</th>
+                <th>Market Share</th>
+                <th>Primary Technology</th>
+                <th>Avg. System Cost</th>
+            </tr>
+            <tr>
+                <td>Philips Lifeline</td>
+                <td>22%</td>
+                <td>Wearable</td>
+                <td>₹35,000</td>
+            </tr>
+            <tr>
+                <td>ADT Health</td>
+                <td>15%</td>
+                <td>Sensor-based</td>
+                <td>₹32,000</td>
+            </tr>
+            <tr>
+                <td>Portea Medical</td>
+                <td>14%</td>
+                <td>Camera-based</td>
+                <td>₹18,000</td>
+            </tr>
+            <tr>
+                <td>Medical Guardian</td>
+                <td>11%</td>
+                <td>Wearable</td>
+                <td>₹28,000</td>
+            </tr>
+            <tr>
+                <td>IoT_Stellar (Ours)</td>
+                <td>New Entrant</td>
+                <td>AI Camera-based</td>
+                <td>₹9,500</td>
+            </tr>
+        </table>
+        
+        <div class="two-column">
+            <div class="column">
+                <div class="chart-container">
+                    <div class="chart-title">Technology Type Distribution</div>
+                    <canvas id="techTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="column">
+                <div class="chart-container">
+                    <div class="chart-title">Foreign vs. Indian Brand Market Share</div>
+                    <canvas id="brandOriginChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Implementation & ROI Section -->
+    <div class="section">
+        <h2>7. Implementation & Return on Investment</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value">₹1.5K</div>
+                <div class="stat-label">Production Cost</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">₹9.5K</div>
+                <div class="stat-label">Market Price</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Break-even (months)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">95-97%</div>
+                <div class="stat-label">Detection Accuracy</div>
+            </div>
+        </div>
+        
+        <ul class="stats-list">
+            <li><strong>Production Cost:</strong> ₹1,200-1,800 per unit</li>
+            <li><strong>Market Selling Price:</strong> ₹9,500 per unit (significantly lower than competitors)</li>
+            <li><strong>Break-even Point:</strong> < 6 months with 200+ units</li>
+            <li><strong>Detection Accuracy:</strong> 95-97%</li>
+            <li><strong>Target Markets:</strong> Hospitals, old-age homes, individual households</li>
+            <li><strong>Integration Potential:</strong> Ayushman Bharat, health insurance, telehealth platforms</li>
+        </ul>
+        
+        <div class="conclusion-box">
+            <p><strong>Social Impact:</strong> Beyond financial returns, the system reduces fatal falls, improves emergency response times, and promotes independent living, offering immeasurable value to families and healthcare systems.</p>
+        </div>
+    </div>
+
+    <script>
+        // Age Distribution Chart (Pie Chart)
+        const ageDistributionChart = document.getElementById('ageDistributionChart').getContext('2d');
+        new Chart(ageDistributionChart, {
+            type: 'pie',
+            data: {
+                labels: ['60-69 years', '70-79 years', '80+ years'],
+                datasets: [{
+                    data: [51.7, 34, 14.3],
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276'],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 14 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Market Growth Chart (Line Chart)
+        const marketGrowthCtx = document.getElementById('marketGrowthChart').getContext('2d');
+        new Chart(marketGrowthCtx, {
+            type: 'line',
+            data: {
+                labels: ['2023', '2024', '2025', '2026', '2027', '2028'],
+                datasets: [{
+                    label: 'Elderly Care Market (₹ Crores)',
+                    data: [32000, 40640, 51613, 65548, 83246, 105762],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Market Size (₹ Crores)',
+                            font: { size: 14 }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Fall Detection Market Chart (Bar Chart)
+        const fallDetectionMarketChart = document.getElementById('fallDetectionMarketChart').getContext('2d');
+        new Chart(fallDetectionMarketChart, {
+            type: 'bar',
+            data: {
+                labels: ['2023', '2028'],
+                datasets: [{
+                    label: 'Fall Detection Market (₹ Crores)',
+                    data: [1800, 5600],
+                    backgroundColor: ['#007bff', '#28a745'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Market Size (₹ Crores)',
+                            font: { size: 14 }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Fall Rate Chart (Bar Chart)
+        const fallRateCtx = document.getElementById('fallRateChart').getContext('2d');
+        new Chart(fallRateCtx, {
+            type: 'bar',
+            data: {
+                labels: ['65-70 years', '71-80 years', '81+ years'],
+                datasets: [{
+                    label: 'Annual Fall Incidence Rate (%)',
+                    data: [22, 31, 45],
+                    backgroundColor: '#3498db',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Percentage (%)',
+                            font: { size: 14 }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Injury Type Chart (Pie Chart)
+        const injuryTypeCtx = document.getElementById('injuryTypeChart').getContext('2d');
+        new Chart(injuryTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Fractures', 'Soft Tissue Injuries', 'Head Injuries', 'Other'],
+                datasets: [{
+                    data: [62, 21, 12, 5],
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276', '#85c1e9'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Tech Adoption Chart (Bar Chart)
+        const techAdoptionCtx = document.getElementById('techAdoptionChart').getContext('2d');
+        new Chart(techAdoptionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Smartphone', 'Internet', 'Smart Home', 'Wearables'],
+                datasets: [{
+                    label: 'Adoption Rate (%)',
+                    data: [45, 38, 12, 17],
+                    backgroundColor: '#3498db',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Percentage (%)',
+                            font: { size: 14 }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Tech Comfort Chart (Pie Chart)
+        const techComfortCtx = document.getElementById('techComfortChart').getContext('2d');
+        new Chart(techComfortCtx, {
+            type: 'pie',
+            data: {
+                labels: ['High Comfort', 'Moderate Comfort', 'Low Comfort'],
+                datasets: [{
+                    data: [22, 35, 43],
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // Adoption Willingness Chart (Pie Chart)
+        const adoptionWillingnessCtx = document.getElementById('adoptionWillingnessChart').getContext('2d');
+        new Chart(adoptionWillingnessCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Willing Without Assistance', 'Willing With Family Support', 'Unwilling'],
+                datasets: [{
+                    data: [27, 53, 20],
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // Market Share Chart (Pie Chart)
+        const marketShareCtx = document.getElementById('marketShareChart').getContext('2d');
+        new Chart(marketShareCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Philips Lifeline', 'ADT Health', 'Portea Medical', 'Medical Guardian', 'IoT_Stellar'],
+                datasets: [{
+                    data: [22, 15, 14, 11, 0], // IoT_Stellar as new entrant
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276', '#85c1e9', '#d5dbdb'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // Tech Type Chart (Pie Chart)
+        const techTypeCtx = document.getElementById('techTypeChart').getContext('2d');
+        new Chart(techTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Wearable', 'Sensor-based', 'Camera-based'],
+                datasets: [{
+                    data: [42, 22, 36], // Based on general distribution from original data
+                    backgroundColor: ['#3498db', '#2874a6', '#1a5276'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // Brand Origin Chart (Pie Chart)
+        const brandOriginCtx = document.getElementById('brandOriginChart').getContext('2d');
+        new Chart(brandOriginCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Foreign Brands', 'Indian Brands'],
+                datasets: [{
+                    data: [68, 32], // Based on original data (68% foreign, 32% Indian)
+                    backgroundColor: ['#3498db', '#2874a6'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
